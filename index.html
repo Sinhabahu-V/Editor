@@ -23,8 +23,8 @@ button{cursor:pointer;font-family:inherit;font-size:13px;border-radius:var(--rad
 .btn-primary:disabled{opacity:.45;cursor:not-allowed}
 .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);padding:7px 16px}
 .btn-outline:hover{background:var(--bg)}
-input,textarea{font-family:inherit;font-size:14px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;outline:none;width:100%;transition:border-color .15s}
-input:focus,textarea:focus{border-color:var(--accent)}
+input,textarea,select{font-family:inherit;font-size:14px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;outline:none;width:100%;transition:border-color .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 
 .setup{max-width:400px;margin:80px auto;padding:0 24px}
 .setup h1{font-size:22px;font-weight:600;margin-bottom:6px}
@@ -66,12 +66,31 @@ input:focus,textarea:focus{border-color:var(--accent)}
 #preview-area li{margin-left:24px;margin-bottom:4px;list-style:disc}
 #preview-area strong{font-weight:700}
 #preview-area em{font-style:italic}
-#preview-area img{max-width:100%;border-radius:6px;margin:8px 0;display:block}
+#preview-area img{border-radius:6px;margin:8px 0;display:block}
+#preview-area img.full{width:100%}
+#preview-area img.half{width:50%}
+#preview-area img.third{width:33%}
+#preview-area img.left{float:left;margin:4px 16px 8px 0}
+#preview-area img.right{float:right;margin:4px 0 8px 16px}
+#preview-area img.center{margin-left:auto;margin-right:auto}
+#preview-area .clearfix{clear:both}
 
-.img-status{font-size:12px;color:var(--muted);padding:2px 6px;border-radius:4px;white-space:nowrap}
+.img-status{font-size:12px;padding:2px 8px;border-radius:4px;white-space:nowrap;display:none}
+.img-status.show{display:inline-block}
 .img-status.uploading{color:var(--warning);background:var(--warning-bg)}
 .img-status.done{color:var(--success);background:var(--success-bg)}
 .img-status.fail{color:var(--danger);background:var(--danger-bg)}
+
+/* Image options panel */
+.img-panel{display:none;margin-top:-1px;border-top:1px solid var(--border);background:var(--bg);padding:14px 16px}
+.img-panel.show{display:block}
+.img-panel-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.img-panel label{font-size:11px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase}
+.img-panel select{padding:7px 10px;font-size:13px}
+.img-panel input[type=text]{padding:7px 10px;font-size:13px}
+.img-panel-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.img-panel-actions .hint-txt{font-size:12px;color:var(--light)}
+.img-panel-thumb{width:48px;height:48px;border-radius:6px;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
 
 .error-box{display:none;align-items:center;gap:8px;margin-top:12px;padding:10px 14px;background:var(--danger-bg);border:1px solid rgba(220,38,38,.2);border-radius:var(--radius);color:var(--danger);font-size:13px}
 
@@ -83,7 +102,7 @@ input:focus,textarea:focus{border-color:var(--accent)}
 .btn-row{display:flex;gap:10px}
 .btn-row button{flex:1}
 
-@media(max-width:600px){.meta-row{grid-template-columns:1fr}.editor-wrap{padding:16px 16px 60px}#title-input{font-size:20px}}
+@media(max-width:600px){.meta-row{grid-template-columns:1fr}.editor-wrap{padding:16px 16px 60px}#title-input{font-size:20px}.img-panel-grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -133,7 +152,7 @@ input:focus,textarea:focus{border-color:var(--accent)}
         <button class="tbtn" data-fmt="bullet">—</button>
         <button class="tbtn" data-fmt="link">Link</button>
         <div class="tsep"></div>
-        <button class="tbtn" id="img-btn" title="Upload image">+ Image</button>
+        <button class="tbtn" id="img-btn">+ Image</button>
         <input type="file" id="img-input" accept="image/*" style="display:none">
         <span class="img-status" id="img-status"></span>
         <div class="tab-group">
@@ -141,7 +160,40 @@ input:focus,textarea:focus{border-color:var(--accent)}
           <button class="tab-btn" id="tab-preview">Preview</button>
         </div>
       </div>
-      <textarea id="write-area" placeholder="Start writing...&#10;&#10;## Use headings to structure your essay&#10;&#10;**Bold**, *italic*, > blockquotes, - bullet lists, [text](url) for links.&#10;Use the + Image button to upload photos."></textarea>
+
+      <!-- Image options panel (shown after upload) -->
+      <div class="img-panel" id="img-panel">
+        <div class="img-panel-grid">
+          <div>
+            <label>Caption</label>
+            <input type="text" id="img-caption" placeholder="Optional caption" />
+          </div>
+          <div>
+            <label>Size</label>
+            <select id="img-size">
+              <option value="full">Full width</option>
+              <option value="half">Half width</option>
+              <option value="third">One third</option>
+            </select>
+          </div>
+          <div>
+            <label>Placement</label>
+            <select id="img-placement">
+              <option value="center">Centre</option>
+              <option value="left">Float left</option>
+              <option value="right">Float right</option>
+            </select>
+          </div>
+        </div>
+        <div class="img-panel-actions">
+          <img id="img-thumb" class="img-panel-thumb" src="" alt="" style="display:none">
+          <button class="btn-primary" id="img-insert-btn">Insert image</button>
+          <button class="btn-outline" id="img-cancel-btn">Cancel</button>
+          <span class="hint-txt" id="img-filename"></span>
+        </div>
+      </div>
+
+      <textarea id="write-area" placeholder="Start writing...&#10;&#10;## Use headings to structure your essay&#10;&#10;**Bold**, *italic*, > blockquotes, - bullet lists, [text](url) for links.&#10;Use + Image to upload and place photos."></textarea>
       <div id="preview-area"></div>
     </div>
     <div class="error-box" id="error-box"><span id="error-msg"></span></div>
@@ -164,12 +216,12 @@ input:focus,textarea:focus{border-color:var(--accent)}
 
 <script>
 const USER='Sinhabahu-V', REPO='Sinhabahu-V.github.io';
-let token='';
+let token='', pendingImg=null;
 
 function show(id){['s-setup','s-editor','s-done'].forEach(s=>document.getElementById(s).style.display=s===id?'block':'none');}
 function setErr(msg){const b=document.getElementById('error-box'),t=document.getElementById('error-msg');t.textContent=msg;b.style.display=msg?'flex':'none';}
-
 function toB64(str){const b=new TextEncoder().encode(str);let s='';for(let i=0;i<b.byteLength;i++)s+=String.fromCharCode(b[i]);return btoa(s);}
+function setImgStatus(msg,cls){const el=document.getElementById('img-status');el.textContent=msg;el.className='img-status'+(msg?' show '+cls:'');}
 
 function renderMd(text){
   let h=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -178,11 +230,21 @@ function renderMd(text){
   h=h.replace(/^# (.+)$/gm,'<h1>$1</h1>');
   h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
   h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');
-  h=h.replace(/!\[(.+?)\]\((.+?)\)/g,'<img src="$2" alt="$1">');
+  // Render figure shortcodes
+  h=h.replace(/\{\{< figure src="([^"]+)" alt="([^"]*)" caption="([^"]*)" class="([^"]*)" >\}\}/g,
+    (m,src,alt,cap,cls)=>{
+      const parts=cls.split(' ');
+      const sz=parts.find(p=>['full','half','third'].includes(p))||'full';
+      const pl=parts.find(p=>['left','right','center'].includes(p))||'center';
+      const widths={full:'100%',half:'50%',third:'33%'};
+      const style='width:'+widths[sz]+';'+(pl==='left'?'float:left;margin:4px 16px 8px 0':pl==='right'?'float:right;margin:4px 0 8px 16px':'display:block;margin:8px auto');
+      return '<figure style="'+style+';margin-bottom:1em"><img src="'+src+'" alt="'+alt+'" style="width:100%;border-radius:6px">'+(cap?'<figcaption style="font-size:13px;color:#6b7280;text-align:center;margin-top:4px">'+cap+'</figcaption>':'')+'</figure><div style="clear:both"></div>';
+    });
+  h=h.replace(/!\[(.+?)\]\((.+?)\)/g,'<img src="$2" alt="$1" style="max-width:100%;border-radius:6px;display:block;margin:8px 0">');
   h=h.replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" target="_blank">$1</a>');
   h=h.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
   h=h.replace(/^- (.+)$/gm,'<li>$1</li>');
-  return h.split('\n\n').map(b=>{const t=b.trim();if(!t)return '';if(/^<[hHbBlLi]/.test(t))return t;return '<p>'+t.replace(/\n/g,'<br>')+'</p>';}).join('');
+  return h.split('\n\n').map(b=>{const t=b.trim();if(!t)return '';if(/^<[hHbBlLfi]/.test(t))return t;return '<p>'+t.replace(/\n/g,'<br>')+'</p>';}).join('');
 }
 
 const fmts={bold:{p:'**',s:'**',ph:'bold text'},italic:{p:'*',s:'*',ph:'italic text'},h2:{p:'\n## ',s:'',ph:'Heading'},h3:{p:'\n### ',s:'',ph:'Heading'},quote:{p:'\n> ',s:'',ph:'Quote text'},bullet:{p:'\n- ',s:'',ph:'List item'},link:{p:'[',s:'](url)',ph:'link text'}};
@@ -191,8 +253,7 @@ function insertAt(text){
   const el=document.getElementById('write-area');
   const s=el.selectionStart;
   el.value=el.value.slice(0,s)+text+el.value.slice(s);
-  el.focus();
-  el.setSelectionRange(s+text.length,s+text.length);
+  el.focus();el.setSelectionRange(s+text.length,s+text.length);
 }
 
 document.querySelectorAll('.tbtn[data-fmt]').forEach(btn=>btn.addEventListener('click',()=>{
@@ -203,22 +264,20 @@ document.querySelectorAll('.tbtn[data-fmt]').forEach(btn=>btn.addEventListener('
   el.focus();el.setSelectionRange(s+f.p.length,s+f.p.length+sel.length);
 }));
 
-// Image upload
+// Image upload flow
 document.getElementById('img-btn').addEventListener('click',()=>document.getElementById('img-input').click());
 
 document.getElementById('img-input').addEventListener('change',async(e)=>{
   const file=e.target.files[0];
   if(!file)return;
-  const statusEl=document.getElementById('img-status');
-  const imgBtn=document.getElementById('img-btn');
-
-  statusEl.textContent='Uploading…';
-  statusEl.className='img-status uploading';
-  imgBtn.disabled=true;
+  document.getElementById('img-btn').disabled=true;
+  setImgStatus('Uploading…','uploading');
+  document.getElementById('img-panel').classList.remove('show');
 
   const reader=new FileReader();
   reader.onload=async(ev)=>{
-    const base64=ev.target.result.split(',')[1];
+    const dataUrl=ev.target.result;
+    const base64=dataUrl.split(',')[1];
     const ext=file.name.split('.').pop().toLowerCase();
     const filename=Date.now()+'.'+ext;
     try{
@@ -228,25 +287,47 @@ document.getElementById('img-input').addEventListener('change',async(e)=>{
          body:JSON.stringify({message:'Add image: '+filename,content:base64})}
       );
       if(res.ok){
-        insertAt('\n![image description](/images/'+filename+')\n');
-        statusEl.textContent='Uploaded!';
-        statusEl.className='img-status done';
-        setTimeout(()=>{statusEl.textContent='';statusEl.className='img-status';},2500);
+        pendingImg={filename,dataUrl};
+        setImgStatus('Uploaded — set options below','done');
+        const thumb=document.getElementById('img-thumb');
+        thumb.src=dataUrl;thumb.style.display='block';
+        document.getElementById('img-filename').textContent=filename;
+        document.getElementById('img-caption').value='';
+        document.getElementById('img-size').value='full';
+        document.getElementById('img-placement').value='center';
+        document.getElementById('img-panel').classList.add('show');
       } else {
         const err=await res.json();
-        statusEl.textContent=err.message||'Upload failed';
-        statusEl.className='img-status fail';
-        setTimeout(()=>{statusEl.textContent='';statusEl.className='img-status';},3000);
+        setImgStatus(err.message||'Upload failed','fail');
+        setTimeout(()=>setImgStatus('',''),3000);
       }
     }catch(err){
-      statusEl.textContent='Network error';
-      statusEl.className='img-status fail';
-      setTimeout(()=>{statusEl.textContent='';statusEl.className='img-status';},3000);
+      setImgStatus('Network error','fail');
+      setTimeout(()=>setImgStatus('',''),3000);
     }
-    imgBtn.disabled=false;
+    document.getElementById('img-btn').disabled=false;
     e.target.value='';
   };
   reader.readAsDataURL(file);
+});
+
+document.getElementById('img-insert-btn').addEventListener('click',()=>{
+  if(!pendingImg)return;
+  const caption=document.getElementById('img-caption').value.trim();
+  const size=document.getElementById('img-size').value;
+  const placement=document.getElementById('img-placement').value;
+  const cls=size+' '+placement;
+  const shortcode='\n{{< figure src="/images/'+pendingImg.filename+'" alt="'+caption+'" caption="'+caption+'" class="'+cls+'" >}}\n';
+  insertAt(shortcode);
+  document.getElementById('img-panel').classList.remove('show');
+  setImgStatus('','');
+  pendingImg=null;
+});
+
+document.getElementById('img-cancel-btn').addEventListener('click',()=>{
+  document.getElementById('img-panel').classList.remove('show');
+  setImgStatus('','');
+  pendingImg=null;
 });
 
 document.getElementById('tab-write').addEventListener('click',()=>{
@@ -309,6 +390,7 @@ document.getElementById('new-post-btn').addEventListener('click',()=>{
   document.getElementById('preview-area').style.display='none';
   document.getElementById('tab-write').classList.add('on');
   document.getElementById('tab-preview').classList.remove('on');
+  document.getElementById('img-panel').classList.remove('show');
   setErr('');show('s-editor');
 });
 
