@@ -12,12 +12,13 @@
   --accent:#2563eb;--accent-bg:#eff6ff;--accent-border:rgba(37,99,235,0.2);
   --danger:#dc2626;--danger-bg:#fef2f2;
   --success:#16a34a;--success-bg:#f0fdf4;
+  --warning:#d97706;--warning-bg:#fffbeb;
   --radius:8px;--max:780px;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
 a{color:var(--accent)}
 button{cursor:pointer;font-family:inherit;font-size:13px;border-radius:var(--radius);transition:opacity .15s,background .15s}
-.btn-primary{background:var(--text);color:#fff;border:none;padding:8px 20px;font-weight:500;letter-spacing:.01em}
+.btn-primary{background:var(--text);color:#fff;border:none;padding:8px 20px;font-weight:500}
 .btn-primary:hover{opacity:.82}
 .btn-primary:disabled{opacity:.45;cursor:not-allowed}
 .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);padding:7px 16px}
@@ -25,7 +26,6 @@ button{cursor:pointer;font-family:inherit;font-size:13px;border-radius:var(--rad
 input,textarea{font-family:inherit;font-size:14px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;outline:none;width:100%;transition:border-color .15s}
 input:focus,textarea:focus{border-color:var(--accent)}
 
-/* ── Setup ── */
 .setup{max-width:400px;margin:80px auto;padding:0 24px}
 .setup h1{font-size:22px;font-weight:600;margin-bottom:6px}
 .setup .sub{color:var(--muted);font-size:14px;margin-bottom:28px;line-height:1.7}
@@ -34,27 +34,26 @@ input:focus,textarea:focus{border-color:var(--accent)}
 .hint{font-size:12px;color:var(--light);margin-top:14px;line-height:1.7}
 .err-inline{display:none;color:var(--danger);font-size:13px;margin-top:8px}
 
-/* ── Editor header ── */
 .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
-.brand{font-size:14px;color:var(--muted);font-weight:400}
+.brand{font-size:14px;color:var(--muted)}
 .brand strong{color:var(--text);font-weight:600}
 
-/* ── Editor body ── */
 .editor-wrap{max-width:var(--max);margin:0 auto;padding:28px 24px 80px}
 #title-input{width:100%;font-size:26px;font-weight:600;border:none;border-bottom:1px solid var(--border);border-radius:0;padding:0 0 14px;margin-bottom:18px;background:transparent;color:var(--text);outline:none}
 #title-input::placeholder{color:#d1d5db}
 .meta-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
 .meta-row label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase}
 
-/* ── Editor box ── */
 .editor-box{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
 .toolbar{display:flex;align-items:center;gap:3px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg);flex-wrap:wrap;row-gap:4px}
 .tbtn{background:transparent;border:1px solid transparent;color:var(--muted);padding:4px 9px;border-radius:5px;font-size:13px;line-height:1.4}
 .tbtn:hover{background:var(--surface);border-color:var(--border);color:var(--text)}
+.tbtn:disabled{opacity:.4;cursor:not-allowed}
 .tsep{width:1px;height:18px;background:var(--border);margin:0 3px;flex-shrink:0}
 .tab-group{margin-left:auto;display:flex;gap:4px}
 .tab-btn{background:transparent;border:1px solid transparent;color:var(--muted);padding:4px 12px;border-radius:20px;font-size:12px}
 .tab-btn.on{background:var(--accent-bg);color:var(--accent);border-color:var(--accent-border)}
+
 #write-area{width:100%;min-height:480px;padding:22px;border:none;resize:vertical;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.95;color:var(--text);background:var(--surface);outline:none;display:block}
 #write-area::placeholder{color:#d1d5db}
 #preview-area{min-height:480px;padding:22px;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.95;background:var(--surface);display:none;color:var(--text)}
@@ -67,9 +66,15 @@ input:focus,textarea:focus{border-color:var(--accent)}
 #preview-area li{margin-left:24px;margin-bottom:4px;list-style:disc}
 #preview-area strong{font-weight:700}
 #preview-area em{font-style:italic}
+#preview-area img{max-width:100%;border-radius:6px;margin:8px 0;display:block}
+
+.img-status{font-size:12px;color:var(--muted);padding:2px 6px;border-radius:4px;white-space:nowrap}
+.img-status.uploading{color:var(--warning);background:var(--warning-bg)}
+.img-status.done{color:var(--success);background:var(--success-bg)}
+.img-status.fail{color:var(--danger);background:var(--danger-bg)}
+
 .error-box{display:none;align-items:center;gap:8px;margin-top:12px;padding:10px 14px;background:var(--danger-bg);border:1px solid rgba(220,38,38,.2);border-radius:var(--radius);color:var(--danger);font-size:13px}
 
-/* ── Done ── */
 .done{max-width:400px;margin:80px auto;padding:0 24px;text-align:center}
 .done-icon{width:56px;height:56px;border-radius:50%;background:var(--success-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;color:var(--success);border:1px solid rgba(22,163,74,.15)}
 .done h2{font-size:20px;font-weight:600;margin-bottom:8px}
@@ -78,11 +83,7 @@ input:focus,textarea:focus{border-color:var(--accent)}
 .btn-row{display:flex;gap:10px}
 .btn-row button{flex:1}
 
-@media(max-width:600px){
-  .meta-row{grid-template-columns:1fr}
-  .editor-wrap{padding:16px 16px 60px}
-  #title-input{font-size:20px}
-}
+@media(max-width:600px){.meta-row{grid-template-columns:1fr}.editor-wrap{padding:16px 16px 60px}#title-input{font-size:20px}}
 </style>
 </head>
 <body>
@@ -91,7 +92,7 @@ input:focus,textarea:focus{border-color:var(--accent)}
 <div id="s-setup">
   <div class="setup">
     <h1>Post editor</h1>
-    <p class="sub">Enter your GitHub token to connect. It's held in memory only — never stored or sent anywhere except GitHub.</p>
+    <p class="sub">Enter your GitHub token to connect. Held in memory only — never stored.</p>
     <div class="field">
       <label>GitHub personal access token</label>
       <input type="password" id="token-input" placeholder="ghp_..." autocomplete="off" />
@@ -122,21 +123,25 @@ input:focus,textarea:focus{border-color:var(--accent)}
     </div>
     <div class="editor-box">
       <div class="toolbar">
-        <button class="tbtn" data-fmt="bold" title="Bold"><strong>B</strong></button>
-        <button class="tbtn" data-fmt="italic" title="Italic"><em>I</em></button>
+        <button class="tbtn" data-fmt="bold"><strong>B</strong></button>
+        <button class="tbtn" data-fmt="italic"><em>I</em></button>
         <div class="tsep"></div>
         <button class="tbtn" data-fmt="h2">H2</button>
         <button class="tbtn" data-fmt="h3">H3</button>
         <div class="tsep"></div>
-        <button class="tbtn" data-fmt="quote" title="Blockquote">"</button>
-        <button class="tbtn" data-fmt="bullet" title="Bullet">—</button>
-        <button class="tbtn" data-fmt="link" title="Link">Link</button>
+        <button class="tbtn" data-fmt="quote">"</button>
+        <button class="tbtn" data-fmt="bullet">—</button>
+        <button class="tbtn" data-fmt="link">Link</button>
+        <div class="tsep"></div>
+        <button class="tbtn" id="img-btn" title="Upload image">+ Image</button>
+        <input type="file" id="img-input" accept="image/*" style="display:none">
+        <span class="img-status" id="img-status"></span>
         <div class="tab-group">
           <button class="tab-btn on" id="tab-write">Write</button>
           <button class="tab-btn" id="tab-preview">Preview</button>
         </div>
       </div>
-      <textarea id="write-area" placeholder="Start writing...&#10;&#10;## Use headings to structure your essay&#10;&#10;Write in plain text — Markdown handles the formatting.&#10;**Bold**, *italic*, > blockquotes, - bullet lists, [text](url) for links."></textarea>
+      <textarea id="write-area" placeholder="Start writing...&#10;&#10;## Use headings to structure your essay&#10;&#10;**Bold**, *italic*, > blockquotes, - bullet lists, [text](url) for links.&#10;Use the + Image button to upload photos."></textarea>
       <div id="preview-area"></div>
     </div>
     <div class="error-box" id="error-box"><span id="error-msg"></span></div>
@@ -173,13 +178,22 @@ function renderMd(text){
   h=h.replace(/^# (.+)$/gm,'<h1>$1</h1>');
   h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
   h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  h=h.replace(/!\[(.+?)\]\((.+?)\)/g,'<img src="$2" alt="$1">');
   h=h.replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" target="_blank">$1</a>');
   h=h.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
   h=h.replace(/^- (.+)$/gm,'<li>$1</li>');
-  return h.split('\n\n').map(b=>{const t=b.trim();if(!t)return '';if(/^<[hHbBlL]/.test(t))return t;return '<p>'+t.replace(/\n/g,'<br>')+'</p>';}).join('');
+  return h.split('\n\n').map(b=>{const t=b.trim();if(!t)return '';if(/^<[hHbBlLi]/.test(t))return t;return '<p>'+t.replace(/\n/g,'<br>')+'</p>';}).join('');
 }
 
 const fmts={bold:{p:'**',s:'**',ph:'bold text'},italic:{p:'*',s:'*',ph:'italic text'},h2:{p:'\n## ',s:'',ph:'Heading'},h3:{p:'\n### ',s:'',ph:'Heading'},quote:{p:'\n> ',s:'',ph:'Quote text'},bullet:{p:'\n- ',s:'',ph:'List item'},link:{p:'[',s:'](url)',ph:'link text'}};
+
+function insertAt(text){
+  const el=document.getElementById('write-area');
+  const s=el.selectionStart;
+  el.value=el.value.slice(0,s)+text+el.value.slice(s);
+  el.focus();
+  el.setSelectionRange(s+text.length,s+text.length);
+}
 
 document.querySelectorAll('.tbtn[data-fmt]').forEach(btn=>btn.addEventListener('click',()=>{
   const f=fmts[btn.dataset.fmt],el=document.getElementById('write-area');
@@ -188,6 +202,52 @@ document.querySelectorAll('.tbtn[data-fmt]').forEach(btn=>btn.addEventListener('
   el.value=el.value.slice(0,s)+f.p+sel+f.s+el.value.slice(e);
   el.focus();el.setSelectionRange(s+f.p.length,s+f.p.length+sel.length);
 }));
+
+// Image upload
+document.getElementById('img-btn').addEventListener('click',()=>document.getElementById('img-input').click());
+
+document.getElementById('img-input').addEventListener('change',async(e)=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  const statusEl=document.getElementById('img-status');
+  const imgBtn=document.getElementById('img-btn');
+
+  statusEl.textContent='Uploading…';
+  statusEl.className='img-status uploading';
+  imgBtn.disabled=true;
+
+  const reader=new FileReader();
+  reader.onload=async(ev)=>{
+    const base64=ev.target.result.split(',')[1];
+    const ext=file.name.split('.').pop().toLowerCase();
+    const filename=Date.now()+'.'+ext;
+    try{
+      const res=await fetch(
+        'https://api.github.com/repos/'+USER+'/'+REPO+'/contents/static/images/'+filename,
+        {method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
+         body:JSON.stringify({message:'Add image: '+filename,content:base64})}
+      );
+      if(res.ok){
+        insertAt('\n![image description](/images/'+filename+')\n');
+        statusEl.textContent='Uploaded!';
+        statusEl.className='img-status done';
+        setTimeout(()=>{statusEl.textContent='';statusEl.className='img-status';},2500);
+      } else {
+        const err=await res.json();
+        statusEl.textContent=err.message||'Upload failed';
+        statusEl.className='img-status fail';
+        setTimeout(()=>{statusEl.textContent='';statusEl.className='img-status';},3000);
+      }
+    }catch(err){
+      statusEl.textContent='Network error';
+      statusEl.className='img-status fail';
+      setTimeout(()=>{statusEl.textContent='';statusEl.className='img-status';},3000);
+    }
+    imgBtn.disabled=false;
+    e.target.value='';
+  };
+  reader.readAsDataURL(file);
+});
 
 document.getElementById('tab-write').addEventListener('click',()=>{
   document.getElementById('write-area').style.display='block';
