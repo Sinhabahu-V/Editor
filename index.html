@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sinhabahu · Post Editor</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f9f9f8;--surface:#fff;--border:rgba(0,0,0,0.1);
+  --text:#1a1a1a;--muted:#6b6b6b;--light:#9ca3af;
+  --accent:#2563eb;--accent-bg:#eff6ff;--accent-border:rgba(37,99,235,0.2);
+  --danger:#dc2626;--danger-bg:#fef2f2;
+  --success:#16a34a;--success-bg:#f0fdf4;
+  --radius:8px;--max:780px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+a{color:var(--accent)}
+button{cursor:pointer;font-family:inherit;font-size:13px;border-radius:var(--radius);transition:opacity .15s,background .15s}
+.btn-primary{background:var(--text);color:#fff;border:none;padding:8px 20px;font-weight:500;letter-spacing:.01em}
+.btn-primary:hover{opacity:.82}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);padding:7px 16px}
+.btn-outline:hover{background:var(--bg)}
+input,textarea{font-family:inherit;font-size:14px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;outline:none;width:100%;transition:border-color .15s}
+input:focus,textarea:focus{border-color:var(--accent)}
+
+/* ── Setup ── */
+.setup{max-width:400px;margin:80px auto;padding:0 24px}
+.setup h1{font-size:22px;font-weight:600;margin-bottom:6px}
+.setup .sub{color:var(--muted);font-size:14px;margin-bottom:28px;line-height:1.7}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;letter-spacing:.06em;text-transform:uppercase}
+.hint{font-size:12px;color:var(--light);margin-top:14px;line-height:1.7}
+.err-inline{display:none;color:var(--danger);font-size:13px;margin-top:8px}
+
+/* ── Editor header ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.brand{font-size:14px;color:var(--muted);font-weight:400}
+.brand strong{color:var(--text);font-weight:600}
+
+/* ── Editor body ── */
+.editor-wrap{max-width:var(--max);margin:0 auto;padding:28px 24px 80px}
+#title-input{width:100%;font-size:26px;font-weight:600;border:none;border-bottom:1px solid var(--border);border-radius:0;padding:0 0 14px;margin-bottom:18px;background:transparent;color:var(--text);outline:none}
+#title-input::placeholder{color:#d1d5db}
+.meta-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.meta-row label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase}
+
+/* ── Editor box ── */
+.editor-box{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.toolbar{display:flex;align-items:center;gap:3px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--bg);flex-wrap:wrap;row-gap:4px}
+.tbtn{background:transparent;border:1px solid transparent;color:var(--muted);padding:4px 9px;border-radius:5px;font-size:13px;line-height:1.4}
+.tbtn:hover{background:var(--surface);border-color:var(--border);color:var(--text)}
+.tsep{width:1px;height:18px;background:var(--border);margin:0 3px;flex-shrink:0}
+.tab-group{margin-left:auto;display:flex;gap:4px}
+.tab-btn{background:transparent;border:1px solid transparent;color:var(--muted);padding:4px 12px;border-radius:20px;font-size:12px}
+.tab-btn.on{background:var(--accent-bg);color:var(--accent);border-color:var(--accent-border)}
+#write-area{width:100%;min-height:480px;padding:22px;border:none;resize:vertical;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.95;color:var(--text);background:var(--surface);outline:none;display:block}
+#write-area::placeholder{color:#d1d5db}
+#preview-area{min-height:480px;padding:22px;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.95;background:var(--surface);display:none;color:var(--text)}
+#preview-area h1{font-size:1.55em;margin:1.2em 0 .5em;font-weight:700}
+#preview-area h2{font-size:1.28em;margin:1.1em 0 .4em;font-weight:600}
+#preview-area h3{font-size:1.1em;margin:.9em 0 .35em;font-weight:600}
+#preview-area p{margin-bottom:.85em}
+#preview-area blockquote{border-left:3px solid #e5e7eb;padding:0 16px;color:var(--muted);margin:12px 0}
+#preview-area a{color:var(--accent);text-decoration:underline}
+#preview-area li{margin-left:24px;margin-bottom:4px;list-style:disc}
+#preview-area strong{font-weight:700}
+#preview-area em{font-style:italic}
+.error-box{display:none;align-items:center;gap:8px;margin-top:12px;padding:10px 14px;background:var(--danger-bg);border:1px solid rgba(220,38,38,.2);border-radius:var(--radius);color:var(--danger);font-size:13px}
+
+/* ── Done ── */
+.done{max-width:400px;margin:80px auto;padding:0 24px;text-align:center}
+.done-icon{width:56px;height:56px;border-radius:50%;background:var(--success-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;color:var(--success);border:1px solid rgba(22,163,74,.15)}
+.done h2{font-size:20px;font-weight:600;margin-bottom:8px}
+.done .sub{color:var(--muted);font-size:14px;margin-bottom:18px;line-height:1.7}
+.url-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--accent);word-break:break-all;margin-bottom:20px;text-align:left}
+.btn-row{display:flex;gap:10px}
+.btn-row button{flex:1}
+
+@media(max-width:600px){
+  .meta-row{grid-template-columns:1fr}
+  .editor-wrap{padding:16px 16px 60px}
+  #title-input{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="s-setup">
+  <div class="setup">
+    <h1>Post editor</h1>
+    <p class="sub">Enter your GitHub token to connect. It's held in memory only — never stored or sent anywhere except GitHub.</p>
+    <div class="field">
+      <label>GitHub personal access token</label>
+      <input type="password" id="token-input" placeholder="ghp_..." autocomplete="off" />
+    </div>
+    <button class="btn-primary" id="connect-btn" style="width:100%">Connect →</button>
+    <div class="err-inline" id="setup-err"></div>
+    <p class="hint">Needs <strong>repo</strong> and <strong>workflow</strong> scopes. Generate at <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a></p>
+  </div>
+</div>
+
+<!-- EDITOR -->
+<div id="s-editor" style="display:none">
+  <header class="topbar">
+    <span class="brand"><strong>Sinhabahu</strong> · post editor</span>
+    <button class="btn-primary" id="publish-btn">Publish →</button>
+  </header>
+  <div class="editor-wrap">
+    <input type="text" id="title-input" placeholder="Post title" />
+    <div class="meta-row">
+      <div>
+        <label>Tags (comma separated)</label>
+        <input type="text" id="tags-input" placeholder="geopolitics, history, strategy" />
+      </div>
+      <div>
+        <label>Description</label>
+        <input type="text" id="desc-input" placeholder="Short summary shown in post list" />
+      </div>
+    </div>
+    <div class="editor-box">
+      <div class="toolbar">
+        <button class="tbtn" data-fmt="bold" title="Bold"><strong>B</strong></button>
+        <button class="tbtn" data-fmt="italic" title="Italic"><em>I</em></button>
+        <div class="tsep"></div>
+        <button class="tbtn" data-fmt="h2">H2</button>
+        <button class="tbtn" data-fmt="h3">H3</button>
+        <div class="tsep"></div>
+        <button class="tbtn" data-fmt="quote" title="Blockquote">"</button>
+        <button class="tbtn" data-fmt="bullet" title="Bullet">—</button>
+        <button class="tbtn" data-fmt="link" title="Link">Link</button>
+        <div class="tab-group">
+          <button class="tab-btn on" id="tab-write">Write</button>
+          <button class="tab-btn" id="tab-preview">Preview</button>
+        </div>
+      </div>
+      <textarea id="write-area" placeholder="Start writing...&#10;&#10;## Use headings to structure your essay&#10;&#10;Write in plain text — Markdown handles the formatting.&#10;**Bold**, *italic*, > blockquotes, - bullet lists, [text](url) for links."></textarea>
+      <div id="preview-area"></div>
+    </div>
+    <div class="error-box" id="error-box"><span id="error-msg"></span></div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div id="s-done" style="display:none">
+  <div class="done">
+    <div class="done-icon">✓</div>
+    <h2>Post published</h2>
+    <p class="sub">GitHub Actions is rebuilding your site. Live in about 60 seconds at:</p>
+    <div class="url-box" id="pub-url"></div>
+    <div class="btn-row">
+      <button class="btn-outline" id="new-post-btn">Write another</button>
+      <button class="btn-outline" id="change-token-btn">Change token</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const USER='Sinhabahu-V', REPO='Sinhabahu-V.github.io';
+let token='';
+
+function show(id){['s-setup','s-editor','s-done'].forEach(s=>document.getElementById(s).style.display=s===id?'block':'none');}
+function setErr(msg){const b=document.getElementById('error-box'),t=document.getElementById('error-msg');t.textContent=msg;b.style.display=msg?'flex':'none';}
+
+function toB64(str){const b=new TextEncoder().encode(str);let s='';for(let i=0;i<b.byteLength;i++)s+=String.fromCharCode(b[i]);return btoa(s);}
+
+function renderMd(text){
+  let h=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+  h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');
+  h=h.replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  h=h.replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" target="_blank">$1</a>');
+  h=h.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
+  h=h.replace(/^- (.+)$/gm,'<li>$1</li>');
+  return h.split('\n\n').map(b=>{const t=b.trim();if(!t)return '';if(/^<[hHbBlL]/.test(t))return t;return '<p>'+t.replace(/\n/g,'<br>')+'</p>';}).join('');
+}
+
+const fmts={bold:{p:'**',s:'**',ph:'bold text'},italic:{p:'*',s:'*',ph:'italic text'},h2:{p:'\n## ',s:'',ph:'Heading'},h3:{p:'\n### ',s:'',ph:'Heading'},quote:{p:'\n> ',s:'',ph:'Quote text'},bullet:{p:'\n- ',s:'',ph:'List item'},link:{p:'[',s:'](url)',ph:'link text'}};
+
+document.querySelectorAll('.tbtn[data-fmt]').forEach(btn=>btn.addEventListener('click',()=>{
+  const f=fmts[btn.dataset.fmt],el=document.getElementById('write-area');
+  if(!f)return;
+  const s=el.selectionStart,e=el.selectionEnd,sel=el.value.slice(s,e)||f.ph;
+  el.value=el.value.slice(0,s)+f.p+sel+f.s+el.value.slice(e);
+  el.focus();el.setSelectionRange(s+f.p.length,s+f.p.length+sel.length);
+}));
+
+document.getElementById('tab-write').addEventListener('click',()=>{
+  document.getElementById('write-area').style.display='block';
+  document.getElementById('preview-area').style.display='none';
+  document.getElementById('tab-write').classList.add('on');
+  document.getElementById('tab-preview').classList.remove('on');
+});
+
+document.getElementById('tab-preview').addEventListener('click',()=>{
+  const body=document.getElementById('write-area').value;
+  document.getElementById('preview-area').innerHTML=body?renderMd(body):'<p style="color:#d1d5db">Nothing to preview yet.</p>';
+  document.getElementById('write-area').style.display='none';
+  document.getElementById('preview-area').style.display='block';
+  document.getElementById('tab-preview').classList.add('on');
+  document.getElementById('tab-write').classList.remove('on');
+});
+
+document.getElementById('connect-btn').addEventListener('click',()=>{
+  const t=document.getElementById('token-input').value.trim();
+  const e=document.getElementById('setup-err');
+  if(!t){e.textContent='Token is required.';e.style.display='block';return;}
+  e.style.display='none';token=t;show('s-editor');
+});
+
+document.getElementById('token-input').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('connect-btn').click();});
+
+document.getElementById('publish-btn').addEventListener('click',async()=>{
+  const title=document.getElementById('title-input').value.trim();
+  const tags=document.getElementById('tags-input').value.trim();
+  const desc=document.getElementById('desc-input').value.trim();
+  const body=document.getElementById('write-area').value.trim();
+  setErr('');
+  if(!title){setErr('Title is required.');return;}
+  if(!body){setErr('Content cannot be empty.');return;}
+  const btn=document.getElementById('publish-btn');
+  btn.textContent='Publishing…';btn.disabled=true;
+  const date=new Date().toISOString().split('T')[0];
+  const slug=title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const file=date+'-'+slug+'.md';
+  const tagList=tags?tags.split(',').map(t=>t.trim()).filter(Boolean):[];
+  const md=['---','title: "'+title.replace(/"/g,'\\"')+'"','date: '+date,'draft: false',
+    tagList.length?'tags: ['+tagList.map(t=>'"'+t+'"').join(', ')+']':null,
+    desc?'description: "'+desc.replace(/"/g,'\\"')+'"':null,
+    '---','',body].filter(l=>l!==null).join('\n');
+  try{
+    const res=await fetch('https://api.github.com/repos/'+USER+'/'+REPO+'/contents/content/posts/'+file,
+      {method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
+       body:JSON.stringify({message:'New post: '+title,content:toB64(md)})});
+    if(res.ok){document.getElementById('pub-url').textContent='https://sinhabahu.net/posts/'+slug+'/';show('s-done');}
+    else{const er=await res.json();setErr(er.message==='Bad credentials'?'Invalid token — check and try again.':(er.message||'GitHub API error.'));}
+  }catch(e){setErr('Network error. Check your connection.');}
+  btn.textContent='Publish →';btn.disabled=false;
+});
+
+document.getElementById('new-post-btn').addEventListener('click',()=>{
+  ['title-input','tags-input','desc-input'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('write-area').value='';
+  document.getElementById('write-area').style.display='block';
+  document.getElementById('preview-area').style.display='none';
+  document.getElementById('tab-write').classList.add('on');
+  document.getElementById('tab-preview').classList.remove('on');
+  setErr('');show('s-editor');
+});
+
+document.getElementById('change-token-btn').addEventListener('click',()=>{token='';document.getElementById('token-input').value='';show('s-setup');});
+</script>
+</body>
+</html>
